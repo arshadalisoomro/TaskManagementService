@@ -4,8 +4,10 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -14,12 +16,13 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import com.hindu.interview.Application;
 import com.hindu.interview.test.builder.TaskBuilder;
 import com.hindu.interview.ws.model.Task;
+import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
-@IntegrationTest
+@IntegrationTest("server.port=0")
 public class TaskControllerIT {
 
 	private static final String DESCRIPTION_FIELD = "description";
@@ -46,7 +49,14 @@ public class TaskControllerIT {
 			.description(THIRD_DESC).priority(THIRD_PRIORITY)
 			.status(THIRD_STATUS).build();
 	private static final String TASK_RESOURCES = "/api/tasks";
-
+	
+	 @Value("${local.server.port}")   
+	    int port;
+	 @Before
+	    public void setUp() {
+	      
+	        RestAssured.port = port;
+	    }
 	@Test
 	public void testCreateTask() {
 		given().contentType(ContentType.JSON).body(FIRST_TASK).when()
